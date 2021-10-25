@@ -1,5 +1,4 @@
-import { Container } from "./style";
-
+import { Container } from "./styles";
 import inComeImg from '../../assets/Entradas.svg';
 import outComeImg from '../../assets/Saídas.svg';
 import totalComeImg from '../../assets/Total.svg';
