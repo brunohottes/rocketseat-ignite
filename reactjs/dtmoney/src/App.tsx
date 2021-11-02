@@ -1,28 +1,54 @@
 import { Dashboard } from "./components/Dashboard";
 import { Header } from "./components/Header";
 import { GlobalStyle } from "./styles/global";
-import { createServer } from "miragejs";
+import { createServer, Model } from "miragejs";
 import { useState } from "react";
 import Modal from 'react-modal';
 import { NewTransactionModal } from "./components/NewTransactionModal";
+import { TransactionProvider } from "./hook/useTransactionsContext";
 
 Modal.setAppElement('#root');
 
 createServer({
-  routes(){
-    this.namespace = 'api';
-    this.get('/transactions', () => {
-      return [
+  models:{
+    transaction: Model
+  },
+  seeds(server){
+    server.db.loadData({
+      transactions:[
         {
           id: 1,
-          title: 'Boleto Bancario',
-          amount: 400,
+          title: 'Dev Front Freelance',
           type: 'deposit',
-          category: 'Food',
-          createdAt: new Date()
+          category: 'Dev',
+          amount: 4500,
+          createdAt: new Date('2021-02-12  10:00:00')
+        },
+        {
+          id: 2,
+          title: 'Aluguel',
+          type: 'withdraw',
+          category: 'Casa',
+          amount: 1100,
+          createdAt: new Date('2021-02-14  09:00:00')
         }
       ]
-    })
+    });
+  },
+
+  routes(){
+    this.namespace = 'api';
+
+    this.get('/transactions', () => {
+      return this.schema.all('transaction');
+    });
+
+    this.post('/transactions', (schema, request) => {
+      const data = JSON.parse(request.requestBody);
+      return schema.create('transaction', data);
+    });
+    
+
   }
 });
 
@@ -38,7 +64,7 @@ export function App() {
   }
 
   return (
-    <>
+    <TransactionProvider>
       <Header onOpenNewTransactionModal={handleOpenNewTransactionModal} />
       <Dashboard />
       <NewTransactionModal  
@@ -46,6 +72,6 @@ export function App() {
         onRequestClose={handleCloseNewTransactionModal}
        />
       <GlobalStyle />
-    </>
+    </TransactionProvider>
   );
 }
